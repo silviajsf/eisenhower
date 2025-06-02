@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prioritize - Eisenhower Matrix</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500&display=swap" rel="stylesheet">
+    <title>Prioritize - Eisenhower Matrix Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --dusty-pink: #EFA3C8;
@@ -16,6 +17,8 @@
             --bg-color: #f9f9f9;
             --text-color: #333;
             --card-bg: #fff;
+            --urgent-red: #ff6b6b;
+            --important-blue: #5f7cff;
         }
 
         [data-theme="dark"] {
@@ -28,6 +31,8 @@
             --bg-color: #2a2a2a;
             --text-color: #f0f0f0;
             --card-bg: #383838;
+            --urgent-red: #ff5252;
+            --important-blue: #6c8eff;
         }
 
         * {
@@ -43,6 +48,7 @@
             transition: all 0.3s ease;
             padding: 20px;
             line-height: 1.6;
+            min-height: 100vh;
         }
 
         header {
@@ -79,6 +85,7 @@
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             margin-bottom: 30px;
+            position: relative;
         }
 
         .task-input h2 {
@@ -92,7 +99,7 @@
             gap: 15px;
         }
 
-        #task-form input, #task-form textarea {
+        #task-form input, #task-form textarea, #task-form select {
             padding: 12px;
             border: 1px solid var(--warm-grey);
             border-radius: 6px;
@@ -121,6 +128,14 @@
             cursor: pointer;
             font-weight: 500;
             transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .quad-option i {
+            margin-bottom: 5px;
+            font-size: 1.2rem;
         }
 
         .quad-option[data-quadrant="1"] {
@@ -185,12 +200,7 @@
             align-items: center;
         }
 
-        .quadrant h3::before {
-            content: "";
-            display: inline-block;
-            width: 15px;
-            height: 15px;
-            border-radius: 50%;
+        .quadrant h3 i {
             margin-right: 10px;
         }
 
@@ -199,17 +209,9 @@
             border: 2px solid var(--dusty-pink);
         }
 
-        .quad-1 h3::before {
-            background-color: var(--dusty-pink);
-        }
-
         .quad-2 {
             background-color: rgba(143, 185, 155, 0.1);
             border: 2px solid var(--sage-green);
-        }
-
-        .quad-2 h3::before {
-            background-color: var(--sage-green);
         }
 
         .quad-3 {
@@ -217,17 +219,9 @@
             border: 2px solid var(--buttercream);
         }
 
-        .quad-3 h3::before {
-            background-color: var(--buttercream);
-        }
-
         .quad-4 {
             background-color: rgba(180, 180, 180, 0.1);
             border: 2px solid var(--warm-grey);
-        }
-
-        .quad-4 h3::before {
-            background-color: var(--warm-grey);
         }
 
         .tasks-container {
@@ -319,18 +313,24 @@
         }
 
         .priority-high {
-            background-color: #ff5252;
-            box-shadow: 0 0 5px #ff5252;
+            background-color: var(--urgent-red);
+            box-shadow: 0 0 5px var(--urgent-red);
         }
 
         .priority-medium {
-            background-color: #ffb74d;
-            box-shadow: 0 0 5px #ffb74d;
+            background-color: var(--important-blue);
+            box-shadow: 0 0 5px var(--important-blue);
         }
 
         .priority-low {
             background-color: #69f0ae;
             box-shadow: 0 0 5px #69f0ae;
+        }
+
+        /* Deadline Warning */
+        .deadline-warning {
+            color: var(--urgent-red);
+            font-weight: 500;
         }
 
         /* Progress Tracker */
@@ -381,6 +381,12 @@
         .priority-overview h2 {
             margin-bottom: 15px;
             color: var(--dusty-pink);
+            display: flex;
+            align-items: center;
+        }
+
+        .priority-overview h2 i {
+            margin-right: 10px;
         }
 
         .priority-list {
@@ -395,6 +401,11 @@
             padding: 10px;
             border-radius: 6px;
             background-color: rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+
+        .priority-item:hover {
+            transform: translateX(5px);
         }
 
         .priority-item .priority-dot {
@@ -402,6 +413,92 @@
             height: 12px;
             border-radius: 50%;
             margin-right: 10px;
+        }
+
+        .priority-item-content {
+            flex-grow: 1;
+        }
+
+        .priority-item-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .priority-item-actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-color);
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .priority-item-actions button:hover {
+            opacity: 1;
+        }
+
+        /* Time Blocking Section */
+        .time-blocking {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .time-blocking h2 {
+            margin-bottom: 15px;
+            color: var(--buttercream);
+            display: flex;
+            align-items: center;
+        }
+
+        .time-blocking h2 i {
+            margin-right: 10px;
+        }
+
+        .time-slots {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+        }
+
+        .time-slot {
+            padding: 8px;
+            border-radius: 4px;
+            background-color: rgba(0,0,0,0.05);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .time-slot:hover {
+            background-color: rgba(143, 185, 155, 0.2);
+        }
+
+        .time-slot.booked {
+            background-color: rgba(239, 163, 200, 0.3);
+            position: relative;
+        }
+
+        .time-slot.booked::after {
+            content: attr(data-task);
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--card-bg);
+            padding: 2px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            font-size: 0.7rem;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 1;
+        }
+
+        .time-slot.booked:hover::after {
+            opacity: 1;
         }
 
         /* Motivational Quote */
@@ -413,6 +510,51 @@
             border-radius: 8px;
             background-color: rgba(143, 185, 155, 0.1);
             color: var(--sage-green);
+            position: relative;
+        }
+
+        .refresh-quote {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--sage-green);
+        }
+
+        /* Reminder Notification */
+        .reminder-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--urgent-red);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            z-index: 100;
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+        }
+
+        .reminder-notification.show {
+            transform: translateX(0);
+        }
+
+        .reminder-notification i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .close-reminder {
+            margin-left: 15px;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
         }
 
         /* Theme Toggle */
@@ -448,6 +590,72 @@
             transform: translateX(26px);
         }
 
+        /* Export Section */
+        .export-section {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .export-section h2 {
+            margin-bottom: 15px;
+            color: var(--deep-blue-grey);
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .export-buttons button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .export-buttons button i {
+            font-size: 1rem;
+        }
+
+        .export-pdf {
+            background-color: var(--burgundy);
+            color: white;
+        }
+
+        .export-image {
+            background-color: var(--deep-blue-grey);
+            color: white;
+        }
+
+        /* Achievement Badge */
+        .achievement-badge {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, var(--dusty-pink), var(--sage-green));
+            color: white;
+            padding: 10px 15px;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 100;
+            transform: translateY(-100px);
+            transition: transform 0.5s ease;
+        }
+
+        .achievement-badge.show {
+            transform: translateY(0);
+        }
+
         /* Footer */
         footer {
             text-align: center;
@@ -474,6 +682,10 @@
                 grid-template-columns: 1fr 1fr;
                 grid-template-rows: 1fr 1fr;
             }
+
+            .time-slots {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
         }
 
         @media (max-width: 480px) {
@@ -487,13 +699,30 @@
                 grid-template-columns: 1fr;
                 grid-template-rows: auto;
             }
+
+            .export-buttons {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body data-theme="light">
     <div class="container">
+        <!-- Achievement Badge -->
+        <div class="achievement-badge" id="achievement-badge">
+            <i class="fas fa-trophy"></i>
+            <span id="badge-text">Achievement Unlocked!</span>
+        </div>
+
+        <!-- Reminder Notification -->
+        <div class="reminder-notification" id="reminder-notification">
+            <i class="fas fa-bell"></i>
+            <span id="reminder-text">Pengingat: Deadline tugas mendekati!</span>
+            <button class="close-reminder" id="close-reminder">&times;</button>
+        </div>
+
         <header>
-            <h1>Prioritize - Eisenhower Matrix</h1>
+            <h1>Prioritize - Eisenhower Matrix Pro</h1>
             <div class="theme-toggle" id="theme-toggle">
                 <span>Dark Mode</span>
                 <div class="toggle-switch"></div>
@@ -502,59 +731,104 @@
 
         <main>
             <section class="task-input">
-                <h2>Tambah Aktivitas Baru</h2>
+                <h2><i class="fas fa-plus-circle"></i> Tambah Aktivitas Baru</h2>
                 <form id="task-form">
                     <input type="text" id="task-name" placeholder="Nama aktivitas..." required>
                     <input type="datetime-local" id="task-deadline">
+                    <select id="task-category">
+                        <option value="">Pilih Kategori (opsional)</option>
+                        <option value="work">Pekerjaan</option>
+                        <option value="study">Belajar</option>
+                        <option value="personal">Pribadi</option>
+                        <option value="health">Kesehatan</option>
+                        <option value="other">Lainnya</option>
+                    </select>
                     <textarea id="task-notes" placeholder="Catatan tambahan..."></textarea>
                     
                     <div class="quadrant-selector">
-                        <button type="button" class="quad-option" data-quadrant="1">Penting & Mendesak</button>
-                        <button type="button" class="quad-option" data-quadrant="2">Penting & Tidak Mendesak</button>
-                        <button type="button" class="quad-option" data-quadrant="3">Tidak Penting & Mendesak</button>
-                        <button type="button" class="quad-option" data-quadrant="4">Tidak Penting & Tidak Mendesak</button>
+                        <button type="button" class="quad-option" data-quadrant="1">
+                            <i class="fas fa-exclamation-circle"></i>
+                            Penting & Mendesak
+                        </button>
+                        <button type="button" class="quad-option" data-quadrant="2">
+                            <i class="fas fa-calendar-check"></i>
+                            Penting & Tidak Mendesak
+                        </button>
+                        <button type="button" class="quad-option" data-quadrant="3">
+                            <i class="fas fa-user-friends"></i>
+                            Tidak Penting & Mendesak
+                        </button>
+                        <button type="button" class="quad-option" data-quadrant="4">
+                            <i class="fas fa-trash-alt"></i>
+                            Tidak Penting & Tidak Mendesak
+                        </button>
                     </div>
                     
-                    <button type="submit">Tambahkan</button>
+                    <button type="submit">Tambahkan <i class="fas fa-plus"></i></button>
                 </form>
             </section>
 
             <div class="motivational-quote" id="motivational-quote">
+                <button class="refresh-quote" id="refresh-quote">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
                 "Fokus pada apa yang penting, bukan hanya apa yang mendesak."
             </div>
 
             <!-- Priority Overview Section -->
             <section class="priority-overview">
-                <h2>Skala Prioritas Terdekat</h2>
+                <h2><i class="fas fa-tasks"></i> Skala Prioritas Terdekat</h2>
                 <div class="priority-list" id="priority-list">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </section>
+
+            <!-- Time Blocking Section -->
+            <section class="time-blocking">
+                <h2><i class="far fa-clock"></i> Time Blocking</h2>
+                <p>Blok waktu untuk fokus mengerjakan tugas prioritas:</p>
+                <div class="time-slots" id="time-slots">
                     <!-- Will be populated by JavaScript -->
                 </div>
             </section>
 
             <section class="eisenhower-matrix">
                 <div class="quadrant quad-1">
-                    <h3>DO (Lakukan Sekarang)</h3>
+                    <h3><i class="fas fa-exclamation-circle"></i> DO (Lakukan Sekarang)</h3>
                     <div class="tasks-container" id="quad-1-tasks"></div>
                 </div>
                 
                 <div class="quadrant quad-2">
-                    <h3>PLAN (Jadwalkan)</h3>
+                    <h3><i class="fas fa-calendar-check"></i> PLAN (Jadwalkan)</h3>
                     <div class="tasks-container" id="quad-2-tasks"></div>
                 </div>
                 
                 <div class="quadrant quad-3">
-                    <h3>DELEGATE (Delegasikan)</h3>
+                    <h3><i class="fas fa-user-friends"></i> DELEGATE (Delegasikan)</h3>
                     <div class="tasks-container" id="quad-3-tasks"></div>
                 </div>
                 
                 <div class="quadrant quad-4">
-                    <h3>ELIMINATE (Hilangkan)</h3>
+                    <h3><i class="fas fa-trash-alt"></i> ELIMINATE (Hilangkan)</h3>
                     <div class="tasks-container" id="quad-4-tasks"></div>
                 </div>
             </section>
 
+            <!-- Export Section -->
+            <section class="export-section">
+                <h2><i class="fas fa-file-export"></i> Export Matriks</h2>
+                <div class="export-buttons">
+                    <button class="export-pdf" id="export-pdf">
+                        <i class="fas fa-file-pdf"></i> Export PDF
+                    </button>
+                    <button class="export-image" id="export-image">
+                        <i class="fas fa-image"></i> Export Gambar
+                    </button>
+                </div>
+            </section>
+
             <section class="progress-tracker">
-                <h2>Progress Hari Ini</h2>
+                <h2><i class="fas fa-chart-line"></i> Progress Hari Ini</h2>
                 <div class="progress-bar">
                     <div class="progress-fill" id="progress-fill">0%</div>
                 </div>
@@ -563,10 +837,12 @@
         </main>
 
         <footer>
-            <p>Dibuat oleh Silvia Jultika</p>
+            <p>Dibuat oleh Silvia Jultika dengan <i class="fas fa-heart" style="color: var(--dusty-pink);"></i></p>
         </footer>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <script>
         // Inisialisasi
         document.addEventListener('DOMContentLoaded', function() {
@@ -583,6 +859,14 @@
             updateProgress();
             displayDailyQuote();
             updatePriorityOverview();
+            setupTimeSlots();
+            setupExportButtons();
+            setupRefreshQuote();
+            setupReminderNotification();
+            checkAchievements();
+            
+            // Start reminder check interval
+            setInterval(checkDeadlineReminders, 60000); // Check every minute
         });
 
         // Generate unique ID
@@ -616,9 +900,12 @@
             const hoursRemaining = getTimeRemaining(task.deadline);
             
             if (task.quadrant === '1') {
-                return hoursRemaining < 24 ? 'high' : 'medium';
+                if (hoursRemaining < 12) return 'high';
+                if (hoursRemaining < 24) return 'medium';
+                return 'low';
             } else if (task.quadrant === '2') {
-                return hoursRemaining < 48 ? 'medium' : 'low';
+                if (hoursRemaining < 24) return 'medium';
+                return 'low';
             } else if (task.quadrant === '3') {
                 return 'low';
             } else {
@@ -633,6 +920,16 @@
                 case 'medium': return 'priority-medium';
                 case 'low': return 'priority-low';
                 default: return '';
+            }
+        }
+
+        // Get priority text
+        function getPriorityText(priority) {
+            switch(priority) {
+                case 'high': return 'Tinggi';
+                case 'medium': return 'Sedang';
+                case 'low': return 'Rendah';
+                default: return 'Tanpa Prioritas';
             }
         }
 
@@ -664,22 +961,27 @@
                 
                 const taskName = document.getElementById('task-name').value;
                 const taskDeadline = document.getElementById('task-deadline').value;
+                const taskCategory = document.getElementById('task-category').value;
                 const taskNotes = document.getElementById('task-notes').value;
                 
                 const task = {
                     id: generateId(),
                     name: taskName,
                     deadline: taskDeadline,
+                    category: taskCategory,
                     notes: taskNotes,
                     quadrant: selectedQuadrant,
                     completed: false,
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    timeSlots: [] // For time blocking
                 };
                 
                 saveTask(task);
                 renderTask(task);
                 updateProgress();
                 updatePriorityOverview();
+                setupTimeSlots();
+                checkAchievements();
                 
                 // Reset form
                 form.reset();
@@ -711,6 +1013,7 @@
             
             const priority = getPriority(task);
             const priorityClass = getPriorityClass(priority);
+            const deadlineClass = getTimeRemaining(task.deadline) < 24 ? 'deadline-warning' : '';
             
             taskElement.innerHTML = `
                 <div class="task-header">
@@ -718,11 +1021,12 @@
                     <h4>${task.name}</h4>
                     ${priorityClass ? `<div class="priority-indicator ${priorityClass}"></div>` : ''}
                 </div>
-                ${task.deadline ? `<p><i class="icon-clock"></i> ${formatDate(task.deadline)}</p>` : ''}
+                ${task.category ? `<p><i class="fas fa-tag"></i> ${task.category}</p>` : ''}
+                ${task.deadline ? `<p class="${deadlineClass}"><i class="far fa-clock"></i> ${formatDate(task.deadline)}</p>` : ''}
                 ${task.notes ? `<p class="task-notes">${task.notes}</p>` : ''}
                 <div class="task-actions">
-                    <button class="edit-btn">Edit</button>
-                    <button class="delete-btn">Hapus</button>
+                    <button class="edit-btn"><i class="fas fa-edit"></i> Edit</button>
+                    <button class="delete-btn"><i class="fas fa-trash-alt"></i> Hapus</button>
                 </div>
             `;
             quadContainer.appendChild(taskElement);
@@ -761,6 +1065,7 @@
                 taskElement.classList.toggle('task-completed');
                 updateProgress();
                 updatePriorityOverview();
+                checkAchievements();
             }
         }
 
@@ -773,6 +1078,7 @@
             // Fill the form with task data
             document.getElementById('task-name').value = task.name;
             document.getElementById('task-deadline').value = task.deadline || '';
+            document.getElementById('task-category').value = task.category || '';
             document.getElementById('task-notes').value = task.notes || '';
             
             // Set the quadrant
@@ -805,6 +1111,7 @@
                 taskElement.remove();
                 updateProgress();
                 updatePriorityOverview();
+                setupTimeSlots();
             }
         }
 
@@ -863,26 +1170,142 @@
             topTasks.forEach(task => {
                 const priority = getPriority(task);
                 const priorityClass = getPriorityClass(priority);
-                const priorityText = {
-                    'high': 'Tinggi',
-                    'medium': 'Sedang',
-                    'low': 'Rendah'
-                }[priority] || '';
+                const priorityText = getPriorityText(priority);
+                const hoursRemaining = getTimeRemaining(task.deadline);
+                let timeRemainingText = '';
+                
+                if (task.deadline) {
+                    if (hoursRemaining < 0) {
+                        timeRemainingText = '(Deadline terlewat!)';
+                    } else if (hoursRemaining < 24) {
+                        timeRemainingText = `(${Math.round(hoursRemaining)} jam lagi)`;
+                    } else {
+                        timeRemainingText = `(${Math.round(hoursRemaining/24)} hari lagi)`;
+                    }
+                }
                 
                 const item = document.createElement('div');
                 item.className = 'priority-item';
                 item.innerHTML = `
                     <div class="priority-dot ${priorityClass}"></div>
-                    <div>
+                    <div class="priority-item-content">
                         <strong>${task.name}</strong>
                         <div>
-                            <small>Kuadran ${task.quadrant} • Prioritas ${priorityText}</small>
-                            ${task.deadline ? `<small> • Deadline: ${formatDate(task.deadline)}</small>` : ''}
+                            <small>Kuadran ${task.quadrant} • Prioritas ${priorityText} ${timeRemainingText}</small>
                         </div>
+                    </div>
+                    <div class="priority-item-actions">
+                        <button class="focus-btn" data-task-id="${task.id}">
+                            <i class="fas fa-crosshairs"></i>
+                        </button>
+                        <button class="time-block-btn" data-task-id="${task.id}">
+                            <i class="far fa-clock"></i>
+                        </button>
                     </div>
                 `;
                 priorityList.appendChild(item);
             });
+            
+            // Add event listeners to action buttons
+            document.querySelectorAll('.focus-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const taskId = this.dataset.taskId;
+                    focusOnTask(taskId);
+                });
+            });
+            
+            document.querySelectorAll('.time-block-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const taskId = this.dataset.taskId;
+                    openTimeBlockModal(taskId);
+                });
+            });
+        }
+
+        // Focus on a specific task
+        function focusOnTask(taskId) {
+            const taskElement = document.querySelector(`[data-task-id="${taskId}"]`);
+            if (taskElement) {
+                taskElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                taskElement.style.animation = 'pulse 1s 2';
+                setTimeout(() => {
+                    taskElement.style.animation = '';
+                }, 2000);
+            }
+        }
+
+        // Setup time slots for time blocking
+        function setupTimeSlots() {
+            const timeSlotsContainer = document.getElementById('time-slots');
+            timeSlotsContainer.innerHTML = '';
+            
+            // Create time slots for a day (8am to 10pm)
+            for (let hour = 8; hour <= 22; hour++) {
+                const timeSlot = document.createElement('div');
+                timeSlot.className = 'time-slot';
+                timeSlot.textContent = `${hour}:00 - ${hour+1}:00`;
+                timeSlot.dataset.hour = hour;
+                
+                // Check if this time slot is booked
+                const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+                const bookedTask = tasks.find(task => 
+                    task.timeSlots && 
+                    task.timeSlots.some(slot => parseInt(slot.hour) === hour)
+                );
+                
+                if (bookedTask) {
+                    timeSlot.classList.add('booked');
+                    timeSlot.dataset.task = bookedTask.name;
+                }
+                
+                timeSlot.addEventListener('click', function() {
+                    openTimeBlockModal(null, hour);
+                });
+                
+                timeSlotsContainer.appendChild(timeSlot);
+            }
+        }
+
+        // Open time block modal
+        function openTimeBlockModal(taskId, hour) {
+            // In a real implementation, you would create a modal here
+            // For simplicity, we'll just show an alert
+            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            
+            if (taskId) {
+                // Block time for specific task
+                const task = tasks.find(t => t.id === taskId);
+                if (task) {
+                    const hourToBlock = prompt(`Blok waktu untuk tugas "${task.name}" (masukkan jam 8-22):`);
+                    if (hourToBlock && hourToBlock >= 8 && hourToBlock <= 22) {
+                        if (!task.timeSlots) task.timeSlots = [];
+                        task.timeSlots.push({ hour: hourToBlock });
+                        localStorage.setItem('tasks', JSON.stringify(tasks));
+                        setupTimeSlots();
+                        showAchievement('Time Blocker', 'Kamu telah memblok waktu untuk fokus bekerja!');
+                    }
+                }
+            } else if (hour) {
+                // Block this specific hour
+                const availableTasks = tasks.filter(t => !t.completed);
+                if (availableTasks.length > 0) {
+                    const taskNames = availableTasks.map(t => t.name);
+                    const selectedTask = prompt(
+                        `Blok waktu ${hour}:00-${hour+1}:00 untuk tugas:\n${taskNames.join('\n')}\n\nMasukkan nama tugas:`
+                    );
+                    
+                    if (selectedTask && taskNames.includes(selectedTask)) {
+                        const task = availableTasks.find(t => t.name === selectedTask);
+                        if (!task.timeSlots) task.timeSlots = [];
+                        task.timeSlots.push({ hour });
+                        localStorage.setItem('tasks', JSON.stringify(tasks));
+                        setupTimeSlots();
+                        showAchievement('Time Blocker', 'Kamu telah memblok waktu untuk fokus bekerja!');
+                    }
+                } else {
+                    alert('Tidak ada tugas yang tersedia untuk dijadwalkan.');
+                }
+            }
         }
 
         // Display daily motivational quote
@@ -894,10 +1317,18 @@
                 "Susun prioritas harianmu secara elegan dan profesional.",
                 "Fokus pada hal-hal yang benar-benar penting dan raih produktivitas yang lebih baik!",
                 "Lakukan yang penting, delegasikan yang mendesak, rencanakan yang strategis.",
-                "Kesibukan bukanlah ukuran produktivitas. Fokuslah pada hasil."
+                "Kesibukan bukanlah ukuran produktivitas. Fokuslah pada hasil.",
+                "Mulailah dengan yang paling penting, dan kerjakan satu per satu.",
+                "Disiplin adalah jembatan antara tujuan dan pencapaian.",
+                "Anda tidak perlu melihat seluruh tangga, cukup ambil langkah pertama."
             ];
             const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
             document.getElementById('motivational-quote').textContent = `"${randomQuote}"`;
+        }
+
+        // Setup refresh quote button
+        function setupRefreshQuote() {
+            document.getElementById('refresh-quote').addEventListener('click', displayDailyQuote);
         }
 
         // Setup theme toggle
@@ -917,6 +1348,114 @@
             const toggleText = toggle.querySelector('span');
             toggleText.textContent = document.body.dataset.theme === 'dark' ? 'Light Mode' : 'Dark Mode';
         }
+
+        // Setup export buttons
+        function setupExportButtons() {
+            document.getElementById('export-pdf').addEventListener('click', exportToPDF);
+            document.getElementById('export-image').addEventListener('click', exportToImage);
+        }
+
+        // Export to PDF
+        function exportToPDF() {
+            const element = document.querySelector('.container');
+            const opt = {
+                margin: 10,
+                filename: 'eisenhower-matrix.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            
+            html2pdf().set(opt).from(element).save();
+            showAchievement('Exporter', 'Kamu telah mengexport matriks ke PDF!');
+        }
+
+        // Export to Image
+        function exportToImage() {
+            const element = document.querySelector('.container');
+            
+            html2canvas(element).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'eisenhower-matrix.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+            
+            showAchievement('Exporter', 'Kamu telah mengexport matriks ke gambar!');
+        }
+
+        // Setup reminder notification
+        function setupReminderNotification() {
+            document.getElementById('close-reminder').addEventListener('click', function() {
+                document.getElementById('reminder-notification').classList.remove('show');
+            });
+        }
+
+        // Check for deadline reminders
+        function checkDeadlineReminders() {
+            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            const now = new Date();
+            const urgentTasks = tasks.filter(task => {
+                if (task.completed || !task.deadline) return false;
+                const deadline = new Date(task.deadline);
+                const hoursRemaining = (deadline - now) / (1000 * 60 * 60);
+                return hoursRemaining < 24 && hoursRemaining > 0;
+            });
+            
+            if (urgentTasks.length > 0) {
+                const taskNames = urgentTasks.map(t => t.name).join(', ');
+                document.getElementById('reminder-text').textContent = 
+                    `Pengingat: Deadline untuk "${taskNames}" mendekati (kurang dari 24 jam)!`;
+                document.getElementById('reminder-notification').classList.add('show');
+                
+                // Auto-hide after 10 seconds
+                setTimeout(() => {
+                    document.getElementById('reminder-notification').classList.remove('show');
+                }, 10000);
+            }
+        }
+
+        // Check for achievements
+        function checkAchievements() {
+            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            const completedCount = tasks.filter(t => t.completed).length;
+            
+            // Check for completion achievements
+            if (completedCount >= 5 && completedCount < 10) {
+                showAchievement('Productivity Starter', 'Kamu telah menyelesaikan 5 tugas!');
+            } else if (completedCount >= 10) {
+                showAchievement('Task Master', 'Kamu telah menyelesaikan 10 tugas!');
+            }
+            
+            // Check for time blocking achievements
+            const timeBlockedTasks = tasks.filter(t => t.timeSlots && t.timeSlots.length > 0);
+            if (timeBlockedTasks.length >= 3) {
+                showAchievement('Time Manager', 'Kamu telah memblok waktu untuk 3 tugas!');
+            }
+        }
+
+        // Show achievement badge
+        function showAchievement(title, message) {
+            const badge = document.getElementById('achievement-badge');
+            document.getElementById('badge-text').textContent = `${title}: ${message}`;
+            badge.classList.add('show');
+            
+            // Hide after 5 seconds
+            setTimeout(() => {
+                badge.classList.remove('show');
+            }, 5000);
+        }
+
+        // Animation for pulse effect
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                0% { box-shadow: 0 0 0 0 rgba(239, 163, 200, 0.7); }
+                70% { box-shadow: 0 0 0 10px rgba(239, 163, 200, 0); }
+                100% { box-shadow: 0 0 0 0 rgba(239, 163, 200, 0); }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
