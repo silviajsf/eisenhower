@@ -242,6 +242,7 @@
             margin-bottom: 10px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.05);
             transition: transform 0.2s;
+            position: relative;
         }
 
         .task-card:hover {
@@ -307,6 +308,31 @@
             text-decoration: line-through;
         }
 
+        /* Priority Indicator */
+        .priority-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .priority-high {
+            background-color: #ff5252;
+            box-shadow: 0 0 5px #ff5252;
+        }
+
+        .priority-medium {
+            background-color: #ffb74d;
+            box-shadow: 0 0 5px #ffb74d;
+        }
+
+        .priority-low {
+            background-color: #69f0ae;
+            box-shadow: 0 0 5px #69f0ae;
+        }
+
         /* Progress Tracker */
         .progress-tracker {
             background-color: var(--card-bg);
@@ -341,6 +367,41 @@
             color: white;
             font-size: 0.7rem;
             font-weight: bold;
+        }
+
+        /* Priority Overview */
+        .priority-overview {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .priority-overview h2 {
+            margin-bottom: 15px;
+            color: var(--dusty-pink);
+        }
+
+        .priority-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .priority-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 6px;
+            background-color: rgba(0,0,0,0.05);
+        }
+
+        .priority-item .priority-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 10px;
         }
 
         /* Motivational Quote */
@@ -462,6 +523,14 @@
                 "Fokus pada apa yang penting, bukan hanya apa yang mendesak."
             </div>
 
+            <!-- Priority Overview Section -->
+            <section class="priority-overview">
+                <h2>Skala Prioritas Terdekat</h2>
+                <div class="priority-list" id="priority-list">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </section>
+
             <section class="eisenhower-matrix">
                 <div class="quadrant quad-1">
                     <h3>DO (Lakukan Sekarang)</h3>
@@ -513,6 +582,7 @@
             setupThemeToggle();
             updateProgress();
             displayDailyQuote();
+            updatePriorityOverview();
         });
 
         // Generate unique ID
@@ -531,6 +601,39 @@
                 hour: '2-digit',
                 minute: '2-digit'
             });
+        }
+
+        // Calculate time remaining in hours
+        function getTimeRemaining(deadline) {
+            if (!deadline) return Infinity;
+            const now = new Date();
+            const dueDate = new Date(deadline);
+            return (dueDate - now) / (1000 * 60 * 60); // Convert to hours
+        }
+
+        // Determine priority based on quadrant and deadline
+        function getPriority(task) {
+            const hoursRemaining = getTimeRemaining(task.deadline);
+            
+            if (task.quadrant === '1') {
+                return hoursRemaining < 24 ? 'high' : 'medium';
+            } else if (task.quadrant === '2') {
+                return hoursRemaining < 48 ? 'medium' : 'low';
+            } else if (task.quadrant === '3') {
+                return 'low';
+            } else {
+                return 'none';
+            }
+        }
+
+        // Get priority color class
+        function getPriorityClass(priority) {
+            switch(priority) {
+                case 'high': return 'priority-high';
+                case 'medium': return 'priority-medium';
+                case 'low': return 'priority-low';
+                default: return '';
+            }
         }
 
         // Setup task form
@@ -576,6 +679,7 @@
                 saveTask(task);
                 renderTask(task);
                 updateProgress();
+                updatePriorityOverview();
                 
                 // Reset form
                 form.reset();
@@ -604,10 +708,15 @@
             const taskElement = document.createElement('div');
             taskElement.className = `task-card ${task.completed ? 'task-completed' : ''}`;
             taskElement.dataset.taskId = task.id;
+            
+            const priority = getPriority(task);
+            const priorityClass = getPriorityClass(priority);
+            
             taskElement.innerHTML = `
                 <div class="task-header">
                     <input type="checkbox" ${task.completed ? 'checked' : ''}>
                     <h4>${task.name}</h4>
+                    ${priorityClass ? `<div class="priority-indicator ${priorityClass}"></div>` : ''}
                 </div>
                 ${task.deadline ? `<p><i class="icon-clock"></i> ${formatDate(task.deadline)}</p>` : ''}
                 ${task.notes ? `<p class="task-notes">${task.notes}</p>` : ''}
@@ -651,6 +760,7 @@
             if (taskElement) {
                 taskElement.classList.toggle('task-completed');
                 updateProgress();
+                updatePriorityOverview();
             }
         }
 
@@ -694,6 +804,7 @@
             if (taskElement) {
                 taskElement.remove();
                 updateProgress();
+                updatePriorityOverview();
             }
         }
 
@@ -710,6 +821,68 @@
             
             document.getElementById('progress-text').textContent = 
                 `${completed} dari ${total} tugas selesai`;
+        }
+
+        // Update priority overview
+        function updatePriorityOverview() {
+            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            const incompleteTasks = tasks.filter(task => !task.completed);
+            
+            // Sort tasks by priority and deadline
+            const sortedTasks = incompleteTasks.sort((a, b) => {
+                // First sort by quadrant (1 > 2 > 3 > 4)
+                if (a.quadrant !== b.quadrant) {
+                    return a.quadrant - b.quadrant;
+                }
+                
+                // Then sort by deadline (earlier first)
+                const aDeadline = a.deadline ? new Date(a.deadline) : null;
+                const bDeadline = b.deadline ? new Date(b.deadline) : null;
+                
+                if (aDeadline && bDeadline) {
+                    return aDeadline - bDeadline;
+                } else if (aDeadline) {
+                    return -1;
+                } else if (bDeadline) {
+                    return 1;
+                }
+                return 0;
+            });
+            
+            const priorityList = document.getElementById('priority-list');
+            priorityList.innerHTML = '';
+            
+            // Display top 5 priority tasks
+            const topTasks = sortedTasks.slice(0, 5);
+            
+            if (topTasks.length === 0) {
+                priorityList.innerHTML = '<p>Tidak ada tugas yang perlu diprioritaskan saat ini.</p>';
+                return;
+            }
+            
+            topTasks.forEach(task => {
+                const priority = getPriority(task);
+                const priorityClass = getPriorityClass(priority);
+                const priorityText = {
+                    'high': 'Tinggi',
+                    'medium': 'Sedang',
+                    'low': 'Rendah'
+                }[priority] || '';
+                
+                const item = document.createElement('div');
+                item.className = 'priority-item';
+                item.innerHTML = `
+                    <div class="priority-dot ${priorityClass}"></div>
+                    <div>
+                        <strong>${task.name}</strong>
+                        <div>
+                            <small>Kuadran ${task.quadrant} • Prioritas ${priorityText}</small>
+                            ${task.deadline ? `<small> • Deadline: ${formatDate(task.deadline)}</small>` : ''}
+                        </div>
+                    </div>
+                `;
+                priorityList.appendChild(item);
+            });
         }
 
         // Display daily motivational quote
